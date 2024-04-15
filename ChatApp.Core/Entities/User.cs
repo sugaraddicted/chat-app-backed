@@ -12,16 +12,12 @@ namespace ChatApp.Core.Entities
         public string Username { get; set; }
         public string Name { get; set; }
         public string Bio { get; set; }
+        public string Interests { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
         public List<Photo> Photos { get; set; } = new();
         public DateTime DateOfBirth { get; set; } = DateTime.UtcNow;
         public DateTime Created { get; set; } = DateTime.UtcNow;
         public DateTime LastActive { get; set; } = DateTime.UtcNow;
-
-        //public int GetAge()
-        //{
-        //    return DateOfBirth.CalculateAge();
-        //}
     }
 }

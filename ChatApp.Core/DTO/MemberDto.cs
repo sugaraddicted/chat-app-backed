@@ -10,6 +10,7 @@ namespace ChatApp.Core.DTO
         public string Username { get; set; }
         public string Name { get; set; }
         public string Bio { get; set; }
+        public string Interests { get; set; }
         public string PhotoUrl { get; set; }
         public List<PhotoDto> Photos { get; set; }
         public int Age { get; set; }
