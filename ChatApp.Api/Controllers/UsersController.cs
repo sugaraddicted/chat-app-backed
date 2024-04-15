@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using ChatApp.Core.DTO;
@@ -30,6 +31,20 @@ namespace ChatApp.Api.Controllers
         public async Task<ActionResult<MemberDto>> GetUserByUsername(string username)
         {
             return await _userRepository.GetUserDtoByUsernameAsync(username);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userRepository.GetByUsernameAsync(username);
+
+            if (user == null) return NotFound();
+
+            _mapper.Map(memberUpdateDto, user);
+
+            await _userRepository.UpdateAsync(user.Id, user);
+            return NoContent();
         }
     }
 }
