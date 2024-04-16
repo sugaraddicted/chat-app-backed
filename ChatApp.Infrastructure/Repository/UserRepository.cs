@@ -33,18 +33,24 @@ namespace ChatApp.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<MemberDto>> GetUserDtosAsync()
+        public async Task<IEnumerable<MemberDto>> GetDtosAsync()
         {
             return await _context.Users
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
         }
 
-        public async Task<MemberDto> GetUserDtoByUsernameAsync(string username)
+        public async Task<MemberDto> GetDtoByUsernameAsync(string username)
         {
             return await _context.Users.Where(u => u.Username == username)
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task<bool> SaveAsync()
+        {
+            if (await _context.SaveChangesAsync() == 0) return false;
+            return true;
         }
     }
 }
