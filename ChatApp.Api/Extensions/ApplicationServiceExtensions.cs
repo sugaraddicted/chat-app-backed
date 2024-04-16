@@ -1,4 +1,5 @@
 ﻿using System;
+using ChatApp.Api.Helpers;
 using ChatApp.Api.Interfaces;
 using ChatApp.Api.Service;
 using ChatApp.Core.Interfaces;
@@ -27,6 +28,8 @@ namespace ChatApp.Api.Extentions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
+            services.AddScoped<IPhotoService, PhotoService>();
 
             return services;
         }
