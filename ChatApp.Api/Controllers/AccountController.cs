@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using ChatApp.Api.Input;
@@ -49,7 +50,9 @@ namespace ChatApp.Api.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserResponse>> Login(LoginInput input)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => 
+            var user = await _context.Users
+                .Include(u => u.Photos)
+                .FirstOrDefaultAsync(u => 
                 u.Username == input.Username);
 
             if (user == null)
@@ -68,7 +71,8 @@ namespace ChatApp.Api.Controllers
             return new UserResponse
             {
                 Username = user.Username,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             };
         }
 
