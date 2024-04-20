@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using ChatApp.Api.Input;
 using ChatApp.Api.Interfaces;
 using ChatApp.Api.Response;
@@ -16,11 +18,13 @@ namespace ChatApp.Api.Controllers
     {
         public readonly AppDbContext _context;
         private readonly ITokenService _tokenService;
+        private readonly IMapper _mapper;
 
-        public AccountController(AppDbContext context, ITokenService tokenService)
+        public AccountController(AppDbContext context, ITokenService tokenService, IMapper mapper)
         {
             _context = context;
             _tokenService = tokenService;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -29,21 +33,23 @@ namespace ChatApp.Api.Controllers
             if (await UserExists(input.Username))
                 return BadRequest("Username is taken");
 
+            var user = _mapper.Map<User>(input);
+
             using var hmac = new HMACSHA512();
-            var user = new User()
-            {
-                Username = input.Username.ToLower(),
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(input.Password)),
-                PasswordSalt = hmac.Key
-            };
+
+            user.Username = input.Username.ToLower();
+            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(input.Password));
+            user.PasswordSalt = hmac.Key;
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
 
+            await _context.SaveChangesAsync();
+            
             return new UserResponse
             {
                 Username = user.Username,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                Name = user.Name
             };
         }
 
@@ -72,7 +78,8 @@ namespace ChatApp.Api.Controllers
             {
                 Username = user.Username,
                 Token = _tokenService.CreateToken(user),
-                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
+                Name = user.Name
             };
         }
 
